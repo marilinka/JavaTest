@@ -1,135 +1,61 @@
 package com.example;
 
-import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class JavaTest {
 
-	public static short location(byte x, byte y)
-	{
-		return (short) ((x << 8)|y);
-	}
-
-	public static byte getXFromLocation(short location)
-	{
-		return (byte)(location >> 8);
-	}
-
-	public static byte getYFromLocation(short location)
-	{
-		return (byte) (location&0xFF);
-	}
-
-	public static short moveLocation(short location, byte width, byte height, String direction)
-	{
-		byte x = getXFromLocation (location);
-		byte y = getYFromLocation (location);
-
-		switch (direction)
-		{
-			case "up":
-				if (y < height-1)
-				{
-					y+=1;
-				}
-				break;
-			case "down":
-				if (y > 0)
-				{
-					y-=1;
-				}
-				break;
-			case "left":
-				if (x > 0)
-				{
-					x-=1;
-				}
-				break;
-			case "right":
-				if (x < width - 1)
-				{
-					x+=1;
-				}
-				break;
-		}
-		return location (x, y);
-	}
 	public static void main(final String[] args) {
-		byte width = 20, height = 6;
-		short locationO = location ((byte) 1, (byte) 2);
-		short locationA = location ((byte) 3, (byte) 3);
+		File template = new File("d:/user_test");
+		File photoTemplate = new File(template, "user_photo.png");
+		File fingerTemplate = new File(template, "user_finger");
+		File fingerDataTemplate = new File(template, "user_finger.data");
 
-		boolean work = true;
-		while(work)
-		{
-			System.out.println();
+		File root = new File("D:/sense_id");
+		root.mkdirs();
 
-			for(byte y = (byte) (height-1); y >= 0; y--)
-			{
-				for (byte x = 0; x < width; x++)
-				{
-					short location = location (x, y);
-					if (location == locationO)
-					{
-						System.out.print("o");
-					}
-					else if (location == locationA)
-					{
-						System.out.print("a");
-					}
-					else
-					{
-						System.out.print("-");
-					}
-					//github hello
+		for (int i = 0; i < 50; i++) {
+			// id m854330ww21qxcvg4f00mic24vh52zxb p 20160829
+			String name = "User #" + i;
+			String barcode = String.format("%032d", i);
+
+			File user = new File(root, "id"+ barcode + "p" + "20160829");
+			user.mkdirs();
+
+			try (OutputStream os = new FileOutputStream(new File(user, "name"))) {
+				os.write(name.getBytes());
+			} catch (Exception ignore) { }
+
+			copy(photoTemplate, new File(user, "photo"));
+			for (int index = 0; index <= 14; ++index) {
+				String finger = "id" + barcode + "pf" + index;
+				copy(fingerTemplate, new File(user, finger));
+				copy(fingerDataTemplate, new File(user, finger + ".data"));
+			}
+		}
+	}
+
+
+
+
+
+
+
+	public static void copy(File src, File dst) {
+		try (InputStream in = new FileInputStream(src)) {
+			try (OutputStream out = new FileOutputStream(dst)) {
+
+				byte[] buf = new byte[1024];
+				int len;
+				while ((len = in.read(buf)) > 0) {
+					out.write(buf, 0, len);
 				}
-				System.out.println();
-			}
-			
-			int letter = readKey();
-			switch (letter)
-			{
-				case 'k':
-					short newLocation = moveLocation (locationA, width, height, "down");
-					if (newLocation != locationO)
-					{
-						locationA = newLocation;
-					}
-					break;
-				case 'j':
-					locationA = moveLocation (locationA, width, height, "left");
-					break;
-				case 'l':
-					locationA = moveLocation (locationA, width, height, "right");
-					break;
-				case 'i':
-					locationA = moveLocation (locationA, width, height, "up");
-					break;
-				case 's':
-					locationO = moveLocation (locationO, width, height, "down");
-					break;
-				case 'a':
-					locationO = moveLocation (locationO, width, height, "left");
-					break;
-				case 'd':
-					locationO = moveLocation (locationO, width, height, "right");
-					break;
-				case 'w':
-					locationO = moveLocation (locationO, width, height, "up");
-					break;
-				case 'q':
-					work = false;
-					System.out.println("Game is over");
-					break;
-			}
-		}
+
+			} catch (Exception ex) {}
+		} catch (Exception ex) {}
 	}
 
-	private static int readKey() {
-		try {
-			return System.in.read();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return 0;
-	}
 }
