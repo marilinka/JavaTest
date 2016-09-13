@@ -1,11 +1,5 @@
 package com.example;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 public class JavaTest {
 
 	public static void main(final String[] args) {
@@ -14,7 +8,7 @@ public class JavaTest {
 			String barcode = String.format("%032d", i);
 
 			String user = "D:/sense_id/id" + barcode + "p20160829";
-			new File(user).mkdirs();
+			MM.mkdirs(user);
 
 			MM.write(user + "/name", name);
 			MM.copy("d:/user_test/user_photo.png", user + "/photo");

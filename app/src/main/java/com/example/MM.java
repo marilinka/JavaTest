@@ -11,6 +11,11 @@ import java.io.OutputStream;
  */
 public class MM {
 
+	@SuppressWarnings("ResultOfMethodCallIgnored")
+	public static void mkdirs(String path) {
+		new File(path).mkdirs();
+	}
+
 	public static boolean copy(String src, String dst) {
 		return copy(new File(src), new File(dst));
 	}
